@@ -26,25 +26,24 @@ pub fn check(cx: &LateContext<'_>, metadata: &Metadata) {
     if let Ok(file) = cx.tcx.sess.source_map().load_file(Path::new("Cargo.toml"))
         && let Some(src) = file.src.as_deref()
         && let Ok(cargo_toml) = toml::from_str::<CargoToml>(src)
+        // if `[workspace.lints]` exists,
+        && !cargo_toml.workspace.lints.is_empty()
     {
-        // if workspace.lints exists,
-        if !cargo_toml.workspace.lints.is_empty() {
-            // for each project that is included in the workspace,
-            for package in &metadata.packages {
-                // if the project's Cargo.toml doesn't have lints.workspace = true
-                if let Ok(file) = cx.tcx.sess.source_map().load_file(package.manifest_path.as_std_path())
-                    && let Some(src) = file.src.as_deref()
-                    && let Ok(cargo_toml) = toml::from_str::<CargoToml>(src)
-                    && !cargo_toml.lints.contains_key("workspace")
-                {
-                    // TODO: Make real span
-                    span_lint(
-                        cx,
-                        UNUSED_WORKSPACE_LINTS,
-                        DUMMY_SP,
-                        "Your project is in a workspace with lints configured, but workspace.lints is not configured.",
-                    );
-                }
+        // for each project that is included in the workspace,
+        for package in &metadata.packages {
+            // if the project's Cargo.toml doesn't have lints.workspace = true
+            if let Ok(file) = cx.tcx.sess.source_map().load_file(package.manifest_path.as_std_path())
+                && let Some(src) = file.src.as_deref()
+                && let Ok(cargo_toml) = toml::from_str::<CargoToml>(src)
+                && !cargo_toml.lints.contains_key("workspace")
+            {
+                // TODO: Make real span
+                span_lint(
+                    cx,
+                    UNUSED_WORKSPACE_LINTS,
+                    DUMMY_SP,
+                    "Your project is in a workspace with lints configured, but workspace.lints is not configured.",
+                );
             }
         }
     }
