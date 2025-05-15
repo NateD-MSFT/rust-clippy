@@ -42,7 +42,10 @@ pub fn check(cx: &LateContext<'_>, metadata: &Metadata) {
                     cx,
                     UNUSED_WORKSPACE_LINTS,
                     DUMMY_SP,
-                    "Your project is in a workspace with lints configured, but workspace.lints is not configured.",
+                    format!(
+                        "Your project {} is in a workspace with lints configured, but workspace.lints is not configured.",
+                        package.name
+                    ),
                 );
             }
         }

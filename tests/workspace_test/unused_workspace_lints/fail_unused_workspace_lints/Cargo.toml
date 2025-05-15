@@ -1,4 +1,4 @@
 [package]
-name = "unused_workspace_lints"
+name = "fail-unused-workspace-lints"
 version = "0.1.0"
 publish = false

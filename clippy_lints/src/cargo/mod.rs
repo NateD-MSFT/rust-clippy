@@ -282,6 +282,7 @@ impl LateLintPass<'_> for Cargo {
             REDUNDANT_FEATURE_NAMES,
             NEGATIVE_FEATURE_NAMES,
             WILDCARD_DEPENDENCIES,
+            UNUSED_WORKSPACE_LINTS,
         ];
         static WITH_DEPS_LINTS: &[&Lint] = &[MULTIPLE_CRATE_VERSIONS];
 
