@@ -6428,6 +6428,7 @@ Released 2018-09-13
 [`unused_self`]: https://rust-lang.github.io/rust-clippy/master/index.html#unused_self
 [`unused_trait_names`]: https://rust-lang.github.io/rust-clippy/master/index.html#unused_trait_names
 [`unused_unit`]: https://rust-lang.github.io/rust-clippy/master/index.html#unused_unit
+[`unused_workspace_lints`]: https://rust-lang.github.io/rust-clippy/master/index.html#unused_workspace_lints
 [`unusual_byte_groupings`]: https://rust-lang.github.io/rust-clippy/master/index.html#unusual_byte_groupings
 [`unwrap_in_result`]: https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_in_result
 [`unwrap_or_default`]: https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_or_default

@@ -2,6 +2,7 @@ mod common_metadata;
 mod feature_name;
 mod lint_groups_priority;
 mod multiple_crate_versions;
+mod unused_workspace_lints;
 mod wildcard_dependencies;
 
 use cargo_metadata::MetadataCommand;
@@ -213,6 +214,43 @@ declare_clippy_lint! {
     "a lint group in `Cargo.toml` at the same priority as a lint"
 }
 
+declare_clippy_lint! {
+    /// ### What it does
+    /// Checks for lint groups with the same priority as lints in the `Cargo.toml`
+    /// [`[lints]` table](https://doc.rust-lang.org/cargo/reference/manifest.html#the-lints-section).
+    ///
+    /// This lint will be removed once [cargo#12918](https://github.com/rust-lang/cargo/issues/12918)
+    /// is resolved.
+    ///
+    /// ### Why is this bad?
+    /// The order of lints in the `[lints]` is ignored, to have a lint override a group the
+    /// `priority` field needs to be used, otherwise the sort order is undefined.
+    ///
+    /// ### Known problems
+    /// Does not check lints inherited using `lints.workspace = true`
+    ///
+    /// ### Example
+    /// ```toml
+    /// # Passed as `--allow=clippy::similar_names --warn=clippy::pedantic`
+    /// # which results in `similar_names` being `warn`
+    /// [lints.clippy]
+    /// pedantic = "warn"
+    /// similar_names = "allow"
+    /// ```
+    /// Use instead:
+    /// ```toml
+    /// # Passed as `--warn=clippy::pedantic --allow=clippy::similar_names`
+    /// # which results in `similar_names` being `allow`
+    /// [lints.clippy]
+    /// pedantic = { level = "warn", priority = -1 }
+    /// similar_names = "allow"
+    /// ```
+    #[clippy::version = "1.88.0"]
+    pub UNUSED_WORKSPACE_LINTS,
+    cargo,
+    "a workspace defines a lint but workspaces.lint is not set to true"
+}
+
 pub struct Cargo {
     allowed_duplicate_crates: FxHashSet<String>,
     ignore_publish: bool,
@@ -225,6 +263,7 @@ impl_lint_pass!(Cargo => [
     MULTIPLE_CRATE_VERSIONS,
     WILDCARD_DEPENDENCIES,
     LINT_GROUPS_PRIORITY,
+    UNUSED_WORKSPACE_LINTS
 ]);
 
 impl Cargo {
@@ -257,6 +296,7 @@ impl LateLintPass<'_> for Cargo {
                     common_metadata::check(cx, &metadata, self.ignore_publish);
                     feature_name::check(cx, &metadata);
                     wildcard_dependencies::check(cx, &metadata);
+                    unused_workspace_lints::check(cx, &metadata);
                 },
                 Err(e) => {
                     for lint in NO_DEPS_LINTS {
